@@ -24,7 +24,6 @@ Route::prefix('auth')->group(function (){
     Route::get('/logout','AuthController@logout')->middleware('auth:api');
     Route::get('/user','AuthController@user')->middleware('auth:api');
     Route::post('/user/{id}','AuthController@userfinder')->middleware('auth:api');
-
 }
 );
 Route::post('/newpost','PostController@new_post')->middleware('auth:api');
@@ -38,6 +37,9 @@ Route::get('/postlikes/{postId}','PostController@postLikes')->middleware('auth:a
 
 Route::get('/posts','PostController@posts')->middleware('auth:api');
 Route::post('/post/{postId}','PostController@post')->middleware('auth:api');
+Route::put('/updatepost/{postId}','PostController@update')->middleware('auth:api');
+Route::delete('/deletepost/{postId}','PostController@destroy')->middleware('auth:api');
+
 
 Route::post('/search','searchController@search')->middleware('auth:api');
 

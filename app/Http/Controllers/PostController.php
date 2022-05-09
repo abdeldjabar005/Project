@@ -54,33 +54,6 @@ class PostController extends Controller
                 $post->tags()->syncWithoutDetaching($tagNames);
             }
         }
-//        $images = $request->file('image');
-//        $temp1 = [];
-//
-//        foreach ($images as $getImage) {
-//        if (!$request->hasFile('image')) {
-//            return response()->json(['upload_file_not_found'], 400);
-//        }
-////        $file = $request->file('image');
-////        if (!$file->isValid()) {
-////            return response()->json(['invalid_file_upload'], 400);
-////        }
-////            return response()->json(['sw']);
-//            $temp1[] = 1;
-//            print_r($temp1);
-//
-//            $image = new Image;
-////        $getImage = $request->image;
-//        $imageName = time() . '.' . $getImage->extension();
-//        $imagePath = public_path() . '/images';
-//        $image->post_id = $post->id;
-//        $image->image_url = $imageName;
-//
-//        $getImage->move($imagePath, $imageName);
-//
-//        $image->save();
-//    }
-
         foreach ($request->file('image') as $imagefile) {
             $image = new Image;
             $imageName = time() .'-'.uniqid(). '.' . $imagefile->extension();
@@ -89,7 +62,79 @@ class PostController extends Controller
             $image->image_url = $imageName;
             $image->save();
         }
-}
+        return new PostResource($post);
+
+    }
+    public function update(request $request, $postId){
+
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|max:150',
+            'description' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors(), 'error']);
+        }
+        $post = Post::where('id', $postId)->first();
+
+
+        $user = Auth::user();
+        $post->title = $request->title;
+        $post->description = $request->description;
+        $post->agency_id = $user->id;
+        $post->agency_name = $user->agency_name;
+
+        $post->save();
+        $tags = $request->tag;
+        $tagNames = [];
+        if (!empty($tags)) {
+            if (is_array($tags) || is_object($tags)) {
+                foreach ($tags as $tagName) {
+                    $tag = Tag::firstOrCreate(['name' => $tagName]);
+                    if ($tag) {
+                        $tagNames[] = $tag->id;
+                    }
+                }
+                $post->tags()->syncWithoutDetaching($tagNames);
+            }
+        }
+        foreach ($request->file('image') as $imagefile) {
+            $image = new Image;
+            $imageName = time() .'-'.uniqid(). '.' . $imagefile->extension();
+            $imagefile->storeAs('/images/posts',$imageName, ['disk' =>   'my_files']);
+            $image->post_id = $post->id;
+            $image->image_url = $imageName;
+            $image->save();
+        }
+    }
+
+    public function destroy($postId)
+    {
+        $post = Post::with('comments')->with('images')->where('id', $postId)->first();
+    foreach ($post->images as $image ) {
+         $image_path = public_path().'/images/posts/'.$image->image_url;
+         unlink($image_path);
+    }
+        $post->delete();
+        $post->tags()->detach();
+        $post->likes()->delete();
+        $post->images()->delete();
+        $post->comments()->delete();
+
+        return response()->json(['success'=>"post deleted"]);
+    }
+
+    public function post($postId)
+    {
+        $post = Post::with('comments')->where('id', $postId)->get();
+        return PostResource::collection($post);
+    }
+
+    public function posts()
+    {
+        $posts = Post::with('comments')->paginate(5);
+        return PostResource::collection($posts);
+    }
 
     public function like($postId)
     {
@@ -144,18 +189,6 @@ class PostController extends Controller
 
     }
 
-
-    public function post($postId)
-    {
-        $post = Post::with('comments')->where('id', $postId)->get();
-        return response()->json([PostResource::collection($post)]);
-    }
-
-    public function posts()
-    {
-        $posts = Post::with('comments')->get();
-        return response()->json([PostResource::collection($posts)]);
-    }
 
     public function postComments($postId)
     {
