@@ -12,6 +12,7 @@ class ImageResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
+
     public function toArray($request)
     {
 
@@ -21,5 +22,7 @@ class ImageResource extends JsonResource
             'imageUrl'  => asset('/images/posts/' .  $this->image_url)
 
         ];
+
     }
+
 }

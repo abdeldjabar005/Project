@@ -12,6 +12,7 @@ class LikeResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
+
     public function toArray($request)
     {
         return [
@@ -19,4 +20,5 @@ class LikeResource extends JsonResource
             'like_post_id' => $this->post_id,
         ];
     }
+
 }

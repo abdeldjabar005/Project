@@ -2,9 +2,9 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class Tag extends ResourceCollection
+class ConversationResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -12,14 +12,13 @@ class Tag extends ResourceCollection
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-
     public function toArray($request)
     {
 
         return [
-            'data' => TagResource::collection($this->collection),
-            'Tags_count' => $this->collection->count(),
+            'sender_id' => $this->sender_id,
+            'receiver_id' => $this->receiver_id,
+            'messages' => new Message($this->messages),
         ];
     }
-
 }

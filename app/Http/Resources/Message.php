@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class Post extends ResourceCollection
+class Message extends ResourceCollection
 {
     /**
      * Transform the resource into an array.
@@ -16,7 +16,8 @@ class Post extends ResourceCollection
     public function toArray($request)
     {
         return [
-            "posts" =>   PostResource::collection($this->collection) ,
-             'Posts_count' => $this->collection->count(),
-        ];    }
+            'data' => MessageResource::collection($this->collection),
+            'Messages_count' => $this->collection->count(),
+        ];
+    }
 }

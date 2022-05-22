@@ -2,23 +2,22 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class User extends ResourceCollection
+class MessageResource extends JsonResource
 {
     /**
      * Transform the resource collection into an array.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
-     *
      */
-    public static $wrap = null;
-
     public function toArray($request)
     {
         return [
-            UserResource::collection($this->collection),
+            'message' => $this->message,
+            'sender_id' => $this->user_id,
+//            'conversation_id' => $this->conversation_id,
         ];
     }
 }

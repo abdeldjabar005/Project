@@ -41,6 +41,13 @@ class AuthController extends Controller
          $user->email = $request->email;
          $user->phone= $request->phone;
          $user->password = bcrypt($request->password);
+        $file = $request->file('image');
+        if($request->hasFile('image')) {
+            $getImage = $request->image;
+            $imageName = time() .'-'.uniqid(). '.' . $file->extension();
+            $file->storeAs('/images/users',$imageName, ['disk' =>   'my_files']);
+            $user->profile_picture = $imageName;
+        }
         $user->save();
         return $this->getAgencyResponses($user);
     }
@@ -67,10 +74,9 @@ class AuthController extends Controller
         $file = $request->file('image');
         if($request->hasFile('image')) {
             $getImage = $request->image;
-            $imageName = time() . '.' . $getImage->extension();
-            $imagePath = public_path() . '/images/users';
+            $imageName = time() .'-'.uniqid(). '.' . $file->extension();
+            $file->storeAs('/images/users',$imageName, ['disk' =>   'my_files']);
             $user->profile_picture = $imageName;
-           $getImage->move($imagePath, $imageName);
         }
 //        if(!$file->isValid()) {
 //            return response()->json(['invalid_file_upload'], 400);
@@ -115,6 +121,24 @@ class AuthController extends Controller
         $user->bio = $request->bio;
         $user->save();
         return response('Bio updated successfully', 200);
+    }
+    public function profilepic(Request $request){
+        $user = Auth::user();
+        $file = $request->file('image');
+        if($request->hasFile('image')) {
+            $getImage = $request->image;
+            $imageName = time() .'-'.uniqid(). '.' . $file->extension();
+            $file->storeAs('/images/users',$imageName, ['disk' =>   'my_files']);
+            $user->profile_picture = $imageName;
+            $user->save();
+            if ($request->user()->role_id == 1){
+                return new AgencyResource($request->user());
+            } else{
+                return new UserResource($request->user());
+            }
+        }else {
+            return response()->json(['upload pic'], 400);
+        }
     }
 
     public function logout(Request $request){

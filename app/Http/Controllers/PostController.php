@@ -6,16 +6,13 @@ use App\Comment;
 use App\Http\Resources\CommentResource as ResourcesComment;
 use App\Http\Resources\ImageResource;
 use App\Http\Resources\LikeResource;
-use App\Http\Resources\LikeResource as ResourcesLike;
 use App\Http\Resources\PostResource;
 use App\Image;
 use App\Like;
 use App\Post;
 use App\Tag;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
@@ -25,9 +22,16 @@ class PostController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
+            'type' => 'required',
             'title' => 'required|max:150',
             'description' => 'required',
-        ]);
+            'price' =>'required|string|max:20',
+            'location' => 'required',
+            'space' => 'required',
+            'bedrooms' => 'required',
+            'bathrooms' => 'required',
+            'garages' => 'required',
+            ]);
 
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors(), 'error']);
@@ -35,10 +39,17 @@ class PostController extends Controller
 
         $user = Auth::user();
         $post = new Post();
+        $post->type = $request->type;
         $post->title = $request->title;
         $post->description = $request->description;
         $post->agency_id = $user->id;
         $post->agency_name = $user->agency_name;
+        $post->location = $request->location;
+        $post->price = $request->price;
+        $post->space = $request->space;
+        $post->bedrooms = $request->bedrooms;
+        $post->bathrooms = $request->bathrooms;
+        $post->garages = $request->garages;
 
         $post->save();
         $tags = $request->tag;
@@ -54,10 +65,19 @@ class PostController extends Controller
                 $post->tags()->syncWithoutDetaching($tagNames);
             }
         }
-        foreach ($request->file('image') as $imagefile) {
+        $file = $request->file('image');
+        if($request->hasFile('image')) {
+            foreach ($file as $imagefile) {
+                $image = new Image;
+                $imageName = time() . '-' . uniqid() . '.' . $imagefile->extension();
+                $imagefile->storeAs('/images/posts', $imageName, ['disk' => 'my_files']);
+                $image->post_id = $post->id;
+                $image->image_url = $imageName;
+                $image->save();
+            }
+        }else{
             $image = new Image;
-            $imageName = time() .'-'.uniqid(). '.' . $imagefile->extension();
-            $imagefile->storeAs('/images/posts',$imageName, ['disk' =>   'my_files']);
+            $imageName = 'default.jpg';
             $image->post_id = $post->id;
             $image->image_url = $imageName;
             $image->save();
@@ -65,24 +85,34 @@ class PostController extends Controller
         return new PostResource($post);
 
     }
-    public function update(request $request, $postId){
+    public function update(Request $request, $postId){
 
-        $validator = Validator::make($request->all(), [
+
+        Validator::make($request->all(), [
+            'type' => 'required',
             'title' => 'required|max:150',
             'description' => 'required',
+            'price' =>'required|string|max:20',
+            'location' => 'required',
+            'space' => 'required',
+            'bedrooms' => 'required',
+            'bathrooms' => 'required',
+            'garages' => 'required',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors(), 'error']);
-        }
         $post = Post::where('id', $postId)->first();
 
-
         $user = Auth::user();
+        $post->type = $request->type;
         $post->title = $request->title;
         $post->description = $request->description;
         $post->agency_id = $user->id;
         $post->agency_name = $user->agency_name;
+        $post->location = $request->location;
+        $post->price = $request->price;
+        $post->space = $request->space;
+        $post->bedrooms = $request->bedrooms;
+        $post->bathrooms = $request->bathrooms;
+        $post->garages = $request->garages;
 
         $post->save();
         $tags = $request->tag;
@@ -98,15 +128,25 @@ class PostController extends Controller
                 $post->tags()->syncWithoutDetaching($tagNames);
             }
         }
-        foreach ($request->file('image') as $imagefile) {
+        $file = $request->file('image');
+        if($request->hasFile('image')) {
+            foreach ($file as $imagefile) {
+                $image = new Image;
+                $imageName = time() . '-' . uniqid() . '.' . $imagefile->extension();
+                $imagefile->storeAs('/images/posts', $imageName, ['disk' => 'my_files']);
+                $image->post_id = $post->id;
+                $image->image_url = $imageName;
+                $image->save();
+            }
+        }else{
             $image = new Image;
-            $imageName = time() .'-'.uniqid(). '.' . $imagefile->extension();
-            $imagefile->storeAs('/images/posts',$imageName, ['disk' =>   'my_files']);
+            $imageName = 'default.jpg';
             $image->post_id = $post->id;
             $image->image_url = $imageName;
             $image->save();
         }
     }
+
 
     public function destroy($postId)
     {
@@ -227,6 +267,25 @@ class PostController extends Controller
         }
 
         return response()->json(['Likes'=>"there is no Likes "]);
+    }
+
+    public function favorite()
+    {
+        $user = Auth::user();
+        $try = [];
+        $Likes = Like::where('user_id', $user->id)->get('post_id');
+        foreach ($Likes as $id){
+            $try[] =$id->post_id;
+        }
+        if($try==null) {
+            //return response()->json(['Posts' => "this user doesnt have any posts in favorite "]);
+			return response()->json(['data' => "false"], 201);
+        }
+        $posts = Post::whereIn('id', $try)->get();
+
+        if($posts!=null){
+            return response()->json(['data' => PostResource::collection($posts)]);
+        }
     }
 
 }

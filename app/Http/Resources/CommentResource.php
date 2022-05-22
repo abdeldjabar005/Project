@@ -12,12 +12,13 @@ class CommentResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
+
     public function toArray($request)
     {
             return [
                 $this->mergeWhen($this->user->role_id === 1, [
                     'agency_id' => $this->user_id,
-                    "agency_name" => $this->user->agency_name,
+                    "user_name" => $this->user->agency_name,
 
                 ]),
                 $this->mergeWhen($this->user->role_id === 2, [
@@ -29,4 +30,5 @@ class CommentResource extends JsonResource
                 'commented_On' => $this->created_at->toFormattedDateString()
             ];
     }
+
 }

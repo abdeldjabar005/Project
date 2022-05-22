@@ -12,11 +12,12 @@ class Like extends ResourceCollection
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
+
     public function toArray($request)
     {
 
         return [
-            "data" => LikeResource::collection($this->collection),
+            'data' => LikeResource::collection($this->collection),
             'Likes_count' => $this->collection->count(),
         ];
     }

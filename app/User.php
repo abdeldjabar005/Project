@@ -53,5 +53,20 @@ class User extends Authenticatable
         return $this->hasMany(Post::class,'agency_id','id')->orderBy('updated_at', 'desc');
 
     }
+    public function sender()
+    {
+        return $this->hasMany(Conversation::class, 'sender_id');
+    }
+
+    public function receiver()
+    {
+        return $this->hasMany(Conversation::class, 'receiver_id');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class ,'user_id' );
+    }
+
 
 }

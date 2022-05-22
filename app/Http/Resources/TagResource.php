@@ -12,6 +12,8 @@ class TagResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
+    public static $wrap = null;
+
     public function toArray($request)
     {
 
@@ -19,4 +21,5 @@ class TagResource extends JsonResource
             'name' => $this->name,
         ];
     }
+
 }

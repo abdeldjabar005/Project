@@ -12,10 +12,11 @@ class Image extends ResourceCollection
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
+
     public function toArray($request)
     {
         return [
-            "data" =>  ImageResource::collection($this->collection),
+            'data' => ImageResource::collection($this->collection),
             'Images_count' => $this->collection->count(),
         ];
     }

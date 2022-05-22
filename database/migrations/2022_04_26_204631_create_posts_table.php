@@ -15,10 +15,18 @@ class CreatePostsTable extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
+
+            $table->text('type');
             $table->text('title');
             $table->longText('description');
             $table->foreignId('agency_id');
             $table->text('agency_name');
+            $table->text('location');
+            $table->integer('price');
+            $table->text('space');
+            $table->integer('bedrooms');
+            $table->integer('bathrooms');
+            $table->integer('garages');
             $table->timestamps();
         });
     }

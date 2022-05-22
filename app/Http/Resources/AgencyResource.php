@@ -15,13 +15,14 @@ class AgencyResource extends JsonResource
     public function toArray($request)
     {
         return [
-//            'role_id' => $this->role_id,
+			'id' => $this->id,
+            'role_id' => $this->role_id,
             'agency_name' => $this->agency_name,
             'registrationNumber' => $this->registrationNumber,
             'email' => $this->email,
             'bio' => $this->bio,
             'phone' => $this->phone,
-            'picture' => $this->profile_picture,
+            'picture' => asset('/images/users/' .  $this->profile_picture),
             'posts' => new Post($this->posts),
 
         ];

@@ -12,10 +12,11 @@ class Comment extends ResourceCollection
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
+
     public function toArray($request)
     {
         return [
-           "data" => CommentResource::collection($this->collection),
+           'data' => CommentResource::collection($this->collection),
             'Comment_count' => $this->collection->count(),
         ];
     }
