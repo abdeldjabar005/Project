@@ -20,7 +20,6 @@ class PostController extends Controller
 
     public function new_post(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'type' => 'required',
             'title' => 'required|max:150',
@@ -31,12 +30,12 @@ class PostController extends Controller
             'bedrooms' => 'required',
             'bathrooms' => 'required',
             'garages' => 'required',
+            'longitude' => 'required',
+            'latitude' => 'required'
             ]);
-
         if ($validator->fails()) {
             return response()->json(['error' => $validator->errors(), 'error']);
         }
-
         $user = Auth::user();
         $post = new Post();
         $post->type = $request->type;
@@ -50,7 +49,8 @@ class PostController extends Controller
         $post->bedrooms = $request->bedrooms;
         $post->bathrooms = $request->bathrooms;
         $post->garages = $request->garages;
-
+        $post->longitude  = $request->longitude ;
+        $post->latitude = $request->latitude;
         $post->save();
         $tags = $request->tag;
         $tagNames = [];
@@ -83,11 +83,8 @@ class PostController extends Controller
             $image->save();
         }
         return new PostResource($post);
-
     }
     public function update(Request $request, $postId){
-
-
         Validator::make($request->all(), [
             'type' => 'required',
             'title' => 'required|max:150',
@@ -98,9 +95,11 @@ class PostController extends Controller
             'bedrooms' => 'required',
             'bathrooms' => 'required',
             'garages' => 'required',
+            'longitude' => 'required',
+            'latitude' => 'required'
+
         ]);
         $post = Post::where('id', $postId)->first();
-
         $user = Auth::user();
         $post->type = $request->type;
         $post->title = $request->title;
@@ -113,7 +112,8 @@ class PostController extends Controller
         $post->bedrooms = $request->bedrooms;
         $post->bathrooms = $request->bathrooms;
         $post->garages = $request->garages;
-
+        $post->longitude  = $request->longitude ;
+        $post->latitude = $request->latitude;
         $post->save();
         $tags = $request->tag;
         $tagNames = [];
@@ -208,7 +208,6 @@ class PostController extends Controller
         $request->validate([
             'comment' => 'required',
         ]);
-
         $user = Auth::user();
 
         $comment=new Comment();
@@ -279,13 +278,26 @@ class PostController extends Controller
         }
         if($try==null) {
             //return response()->json(['Posts' => "this user doesnt have any posts in favorite "]);
-			return response()->json(['data' => "false"], 201);
+			return response()->json(['data' => "Empty"], 201);
         }
-        $posts = Post::whereIn('id', $try)->get();
+        $posts = Post::whereIn('id', $try)->paginate(5);
 
         if($posts!=null){
             return response()->json(['data' => PostResource::collection($posts)]);
         }
+    }
+
+    public function getUserOffers(){
+        $user = Auth::user();
+
+        $posts = Post::with('comments')->where('agency_id', $user->id)->paginate(5);
+        return PostResource::collection($posts);
+    }
+
+    public function UserOffers($userid){
+        
+        $posts = Post::with('comments')->where('agency_id', $userid)->paginate(5);
+        return PostResource::collection($posts);
     }
 
 }

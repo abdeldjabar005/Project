@@ -8,7 +8,7 @@ class Post extends Model
 {
     protected $fillable = [
 
-        'type','title','description', 'agency_id', "agency_name",'id','location','price', 'space','bedrooms','bathrooms','garages'
+        'type','title','description', 'agency_id', "agency_name",'id','location','price', 'space','bedrooms','bathrooms','garages','longitude','latitude'
     ];
 
     public function user(){

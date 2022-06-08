@@ -20,7 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('last_name')->nullable();
             $table->string('agency_name')->nullable();
             $table->string('registrationNumber')->nullable();
-            $table->text('bio')->nullable();
+            $table->text('bio')->default('This user has not set a bio yet');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('profile_picture')->default('avatar.jpg');

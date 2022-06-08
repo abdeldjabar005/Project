@@ -27,6 +27,8 @@ class CreatePostsTable extends Migration
             $table->integer('bedrooms');
             $table->integer('bathrooms');
             $table->integer('garages');
+            $table->double('longitude');
+            $table->double('latitude');
             $table->timestamps();
         });
     }

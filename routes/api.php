@@ -30,6 +30,8 @@ Route::prefix('auth')->group(function (){
 Route::post('/newpost','PostController@new_post')->middleware('auth:api');
 Route::post('/newtag','TagController@createTag')->middleware('auth:api');
 
+Route::get('/userposts/{userid}','PostController@UserOffers')->middleware('auth:api');
+
 Route::post('/comment','PostController@comment')->middleware('auth:api');
 Route::post('/like/{postId}','PostController@like')->middleware('auth:api');
 Route::get('/postcomments/{postId}','PostController@postComments')->middleware('auth:api');
@@ -39,6 +41,7 @@ Route::get('/favorite','PostController@favorite')->middleware('auth:api');
 
 
 Route::get('/posts','PostController@posts')->middleware('auth:api');
+Route::get('/userOffers','PostController@getUserOffers')->middleware('auth:api');
 Route::post('/post/{postId}','PostController@post')->middleware('auth:api');
 Route::put('/updatepost/{postId}','PostController@update')->middleware('auth:api');
 Route::delete('/deletepost/{postId}','PostController@destroy')->middleware('auth:api');
@@ -49,17 +52,4 @@ Route::post('/search','searchController@search')->middleware('auth:api');
 
 Route::post('/sendmessage/{id}','MessagesController@sendmessage')->middleware('auth:api');
 Route::get('/getconversation/{id}','MessagesController@getconversation')->middleware('auth:api');
-
-//
-//Route::get('/postss', function() {
-//    return new \App\Http\Resources\Post(\App\Post::with('comments')->get());
-//});
-
-//Route::get('/comments', function() {
-//    return new \App\Http\Resources\Comment(\App\Comment::all());
-//});
-//
-//Route::get('/likes', function() {
-//    return new \App\Http\Resources\Like(\App\Like::all());
-//});
 

@@ -43,7 +43,6 @@ class AuthController extends Controller
          $user->password = bcrypt($request->password);
         $file = $request->file('image');
         if($request->hasFile('image')) {
-            $getImage = $request->image;
             $imageName = time() .'-'.uniqid(). '.' . $file->extension();
             $file->storeAs('/images/users',$imageName, ['disk' =>   'my_files']);
             $user->profile_picture = $imageName;
@@ -73,17 +72,11 @@ class AuthController extends Controller
         $user->password = bcrypt($request->password);
         $file = $request->file('image');
         if($request->hasFile('image')) {
-            $getImage = $request->image;
             $imageName = time() .'-'.uniqid(). '.' . $file->extension();
             $file->storeAs('/images/users',$imageName, ['disk' =>   'my_files']);
             $user->profile_picture = $imageName;
         }
-//        if(!$file->isValid()) {
-//            return response()->json(['invalid_file_upload'], 400);
-//        }
-
         $user->save();
-
         return $this->getClientResponses($user);
     }
 
@@ -112,8 +105,6 @@ class AuthController extends Controller
 
 
     public function updatebio(Request $request){
-
-
         $request->validate([
             'bio' => 'required',
         ]);
@@ -182,13 +173,10 @@ class AuthController extends Controller
 
     }
     private function getClientResponses(User $user){
-
         $tokenResult =   $user->createToken("Personal Access Token");
         $token = $tokenResult->token;
         $token->expires_at = Carbon::now()->addWeeks(1);
         $token->save();
-
-
         return  response([
             'accessToken' => $tokenResult->accessToken,
             'tokenType' => "Bearer",
